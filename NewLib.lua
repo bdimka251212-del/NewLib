@@ -1080,7 +1080,10 @@ do
                 KeyPicker.Mode = Mode;
 
                 Label.TextColor3 = Library.AccentColor;
-                Library.RegistryMap[Label].Properties.TextColor3 = 'AccentColor';
+                local Reg = Library.RegistryMap[Label];
+                if Reg then
+                    Reg.Properties.TextColor3 = 'AccentColor';
+                end;
 
                 ModeSelectOuter.Visible = false;
             end;
@@ -1089,7 +1092,10 @@ do
                 KeyPicker.Mode = nil;
 
                 Label.TextColor3 = Library.FontColor;
-                Library.RegistryMap[Label].Properties.TextColor3 = 'FontColor';
+                local Reg = Library.RegistryMap[Label];
+                if Reg then
+                    Reg.Properties.TextColor3 = 'FontColor';
+                end;
             end;
 
             Label.InputBegan:Connect(function(Input)
@@ -1107,7 +1113,7 @@ do
         end;
 
         function KeyPicker:Update()
-            if Info.NoUI then
+            if Info.NoUI or not ContainerLabel then
                 return;
             end;
 
@@ -1115,10 +1121,16 @@ do
 
             ContainerLabel.Text = string.format('[%s] %s (%s)', KeyPicker.Value, Info.Text, KeyPicker.Mode);
 
-            ContainerLabel.Visible = true;
-            ContainerLabel.TextColor3 = State and Library.AccentColor or Library.FontColor;
-
-            Library.RegistryMap[ContainerLabel].Properties.TextColor3 = State and 'AccentColor' or 'FontColor';
+            if KeyPicker.Value == 'None' then
+                ContainerLabel.Visible = false;
+            else
+                ContainerLabel.Visible = true;
+                ContainerLabel.TextColor3 = State and Library.AccentColor or Library.FontColor;
+                local Reg = Library.RegistryMap[ContainerLabel];
+                if Reg then
+                    Reg.Properties.TextColor3 = State and 'AccentColor' or 'FontColor';
+                end;
+            end;
 
             local YSize = 0
             local XSize = 0
@@ -1150,10 +1162,14 @@ do
                         or Key == 'MB2' and InputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton2)
                         or Key == 'MB3' and InputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton3);
                 else
-                    return InputService:IsKeyDown(Enum.KeyCode[KeyPicker.Value]);
+                    local KeyCode = Enum.KeyCode[KeyPicker.Value];
+                    if KeyCode then
+                        return InputService:IsKeyDown(KeyCode);
+                    end
+                    return false;
                 end;
             else
-                return KeyPicker.Toggled;
+                return KeyPicker.Toggled or false;
             end;
         end;
 
@@ -1857,8 +1873,11 @@ do
             ToggleInner.BackgroundColor3 = Toggle.Value and Library.AccentColor or Library.MainColor;
             ToggleInner.BorderColor3 = Toggle.Value and Library.AccentColorDark or Library.OutlineColor;
 
-            Library.RegistryMap[ToggleInner].Properties.BackgroundColor3 = Toggle.Value and 'AccentColor' or 'MainColor';
-            Library.RegistryMap[ToggleInner].Properties.BorderColor3 = Toggle.Value and 'AccentColorDark' or 'OutlineColor';
+            local Reg = Library.RegistryMap[ToggleInner];
+            if Reg then
+                Reg.Properties.BackgroundColor3 = Toggle.Value and 'AccentColor' or 'MainColor';
+                Reg.Properties.BorderColor3 = Toggle.Value and 'AccentColorDark' or 'OutlineColor';
+            end;
         end;
 
         function Toggle:OnChanged(Func)
@@ -2371,7 +2390,10 @@ do
                     end;
 
                     ButtonLabel.TextColor3 = Selected and Library.AccentColor or Library.FontColor;
-                    Library.RegistryMap[ButtonLabel].Properties.TextColor3 = Selected and 'AccentColor' or 'FontColor';
+                    local Reg = Library.RegistryMap[ButtonLabel];
+                    if Reg then
+                        Reg.Properties.TextColor3 = Selected and 'AccentColor' or 'FontColor';
+                    end;
                 end;
 
                 ButtonLabel.InputBegan:Connect(function(Input)
@@ -3104,14 +3126,20 @@ function Library:CreateWindow(...)
 
             Blocker.BackgroundTransparency = 0;
             TabButton.BackgroundColor3 = Library.MainColor;
-            Library.RegistryMap[TabButton].Properties.BackgroundColor3 = 'MainColor';
+            local Reg = Library.RegistryMap[TabButton];
+            if Reg then
+                Reg.Properties.BackgroundColor3 = 'MainColor';
+            end;
             TabFrame.Visible = true;
         end;
 
         function Tab:HideTab()
             Blocker.BackgroundTransparency = 1;
             TabButton.BackgroundColor3 = Library.BackgroundColor;
-            Library.RegistryMap[TabButton].Properties.BackgroundColor3 = 'BackgroundColor';
+            local Reg = Library.RegistryMap[TabButton];
+            if Reg then
+                Reg.Properties.BackgroundColor3 = 'BackgroundColor';
+            end;
             TabFrame.Visible = false;
         end;
 
@@ -3339,7 +3367,10 @@ function Library:CreateWindow(...)
                     Block.Visible = true;
 
                     Button.BackgroundColor3 = Library.BackgroundColor;
-                    Library.RegistryMap[Button].Properties.BackgroundColor3 = 'BackgroundColor';
+                    local Reg = Library.RegistryMap[Button];
+                    if Reg then
+                        Reg.Properties.BackgroundColor3 = 'BackgroundColor';
+                    end;
 
                     Tab:Resize();
                 end;
@@ -3349,7 +3380,10 @@ function Library:CreateWindow(...)
                     Block.Visible = false;
 
                     Button.BackgroundColor3 = Library.MainColor;
-                    Library.RegistryMap[Button].Properties.BackgroundColor3 = 'MainColor';
+                    local Reg = Library.RegistryMap[Button];
+                    if Reg then
+                        Reg.Properties.BackgroundColor3 = 'MainColor';
+                    end;
                 end;
 
                 function Tab:Resize()
@@ -3490,7 +3524,9 @@ local function OnPlayerChange()
     for _, Value in next, Options do
         if Value.Type == 'Dropdown' and Value.SpecialType == 'Player' then
             Value.Values = PlayerList;
-            Value:SetValues();
+            if Value.SetValues then
+                Value:SetValues();
+            end
         end;
     end;
 end;
