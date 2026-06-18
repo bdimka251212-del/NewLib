@@ -1121,7 +1121,7 @@ do
 
             ContainerLabel.Text = string.format('[%s] %s (%s)', KeyPicker.Value, Info.Text, KeyPicker.Mode);
 
-            if KeyPicker.Value == 'None' then
+            if KeyPicker.Value == 'None' and KeyPicker.Mode ~= 'Always' then
                 ContainerLabel.Visible = false;
             else
                 ContainerLabel.Visible = true;
